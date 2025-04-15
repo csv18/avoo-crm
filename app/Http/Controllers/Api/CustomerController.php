@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\RetrieveCustomerRequest;
 use App\Strategies\Payment\PaymentServiceStrategy;
 use Illuminate\Http\Request;
 
@@ -26,21 +27,21 @@ class CustomerController extends Controller
         return response()->json($response);
     }
 
-    public function retrieve(Request $request, string $customer_id)
+    public function retrieve(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
-        $response = $paymentService->retrieveCustomer(['customer_id' => $customer_id]);
+        $response = $paymentService->retrieveCustomer();
         return response()->json($response);
     }
 
-    public function delete(Request $request, string $customer_id)
+    public function delete(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
-        $response = $paymentService->deleteCustomer(['customer_id' => $customer_id]);
+        $response = $paymentService->deleteCustomer();
         return response()->json($response);
     }
 

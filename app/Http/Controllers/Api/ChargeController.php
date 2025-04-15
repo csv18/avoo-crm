@@ -30,13 +30,13 @@ class ChargeController extends Controller
         return response()->json($response);
     }
 
-    public function retrieve(Request $request, string $charge_id)
+    public function retrieve(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
         // Pass the charge_id to retrieve charge details
-        $response = $paymentService->retrieveCharge(['charge_id' => $charge_id]);
+        $response = $paymentService->retrieveCharge();
 
         return response()->json($response);
     }

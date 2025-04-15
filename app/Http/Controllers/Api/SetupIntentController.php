@@ -25,7 +25,7 @@ class SetupIntentController extends Controller
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
         // Pass the setup_intent_id to retrieve setup intent details
-        $response = $paymentService->retrieveSetupIntent(['setup_intent_id' => $request->setup_intent_id]);
+        $response = $paymentService->retrieveSetupIntent();
 
         return response()->json($response);
     }

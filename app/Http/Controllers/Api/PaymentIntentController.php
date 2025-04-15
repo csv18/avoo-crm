@@ -26,39 +26,39 @@ class PaymentIntentController extends Controller
         return response()->json($response);
     }
 
-    public function retrieve(Request $request, string $payment_intent_id)
+    public function retrieve(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
-        $response = $paymentService->retrievePaymentIntent(['payment_intent_id' => $payment_intent_id]);
+        $response = $paymentService->retrievePaymentIntent();
         return response()->json($response);
     }
 
-    public function cancel(Request $request, string $payment_intent_id)
+    public function cancel(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
-        $response = $paymentService->cancelPaymentIntent(['payment_intent_id' => $payment_intent_id]);
+        $response = $paymentService->cancelPaymentIntent();
         return response()->json($response);
     }
 
-    public function capture(Request $request, string $payment_intent_id)
+    public function capture(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
-        $response = $paymentService->capturePaymentIntent(['payment_intent_id' => $payment_intent_id] + $request->all());
+        $response = $paymentService->capturePaymentIntent();
         return response()->json($response);
     }
 
-    public function confirm(Request $request, string $payment_intent_id)
+    public function confirm(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
-        $response = $paymentService->confirmPaymentIntent(['payment_intent_id' => $payment_intent_id] + $request->all());
+        $response = $paymentService->confirmPaymentIntent();
         return response()->json($response);
     }
 
@@ -80,30 +80,30 @@ class PaymentIntentController extends Controller
         return response()->json($response);
     }
 
-    public function incrementAuthorization(Request $request, string $payment_intent_id)
+    public function incrementAuthorization(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
-        $response = $paymentService->incrementAuthorization(['payment_intent_id' => $payment_intent_id] + $request->all());
+        $response = $paymentService->incrementAuthorization();
         return response()->json($response);
     }
 
-    public function applyCustomerBalance(Request $request, string $payment_intent_id)
+    public function applyCustomerBalance(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
-        $response = $paymentService->applyCustomerBalance(['payment_intent_id' => $payment_intent_id]);
+        $response = $paymentService->applyCustomerBalance();
         return response()->json($response);
     }
 
-    public function verifyMicrodeposits(Request $request, string $payment_intent_id)
+    public function verifyMicrodeposits(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
-        $response = $paymentService->verifyPaymentIntentMicrodeposits(['payment_intent_id' => $payment_intent_id] + $request->all());
+        $response = $paymentService->verifyPaymentIntentMicrodeposits();
         return response()->json($response);
     }
 }

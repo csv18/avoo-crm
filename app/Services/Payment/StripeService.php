@@ -17,8 +17,12 @@ class StripeService
 
     protected function sendRequest(array $payload, string $endpoint)
     {
-        return Http::withToken($this->apiKey)
-            ->post("{$this->baseUrl}/payment/{$endpoint}", $payload)  // Different endpoint for customer and charge
+        return Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->apiKey,
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ])
+            ->post("{$this->baseUrl}/payment/{$endpoint}", $payload)
             ->throw()
             ->json();
     }
@@ -31,47 +35,32 @@ class StripeService
     {
         $data = array_merge([
             'action' => 'createCustomer',
+            'name' => 'Vignesh',
+            'email' => 'vigneshcs18172@gmail.com',
+            'phone' => '6282053205',
+            'monolith_customer_id' => 'cus_ty6654sdf',
             'service' => 'stripe',
-            'monolith_customer_id' => 'test_12345',
-            'name' => 'John Doe',
-            'email' => 'john.doe@example.com',
-            'phone' => '1234567890',
-            'description' => 'Test customer',
-            'metadata' => ['source' => 'testing'],
+            'type' => 1,
 
-            'address' => [
-                'line1' => '123 Test St',
-                'line2' => 'Suite 100',
-                'city' => 'Testville',
-                'state' => 'TS',
-                'country' => 'US',
-                'postal_code' => '12345',
-            ],
-
-            'shipping' => [
-                'name' => 'John Doe',
-                'phone' => '1234567890',
-                'address' => [
-                    'line1' => '123 Shipping Ln',
-                    'line2' => 'Dock 9',
-                    'city' => 'ShipCity',
-                    'state' => 'SC',
-                    'country' => 'US',
-                    'postal_code' => '54321',
-                ]
-            ],
-
-            'payment_method' => 'pm_card_visa',
-            'tax' => ['vat' => '123456789'],
-            'balance' => 0,
-            'invoice_prefix' => 'JDOE',
-            'preferred_locales' => ['en'],
-            'promotion_code' => 'PROMO123',
-            'tax_exempt' => 'none',
-
+            'address' => [], // no address details provided
+            'description' => '',
+            'metadata' => [],
+            'payment_method' => '',
+            'shipping' => [],
+            'tax' => [],
+            'balance' => '',
+            'cash_balance' => '',
+            'invoice_prefix' => '',
+            'invoice_settings' => [],
+            'next_invoice_sequence' => '',
+            'preferred_locales' => [],
+            'source' => '',
+            'tax_exempt' => '',
+            'tax_id_data' => [],
+            'test_clock' => '',
         ], $data);
 
-        return $this->sendRequest($data, 'customer');
+        return $this->sendRequest($data, 'customers');
     }
 
     public function updateCustomer(array $data = [])
@@ -79,48 +68,30 @@ class StripeService
         $data = array_merge([
             'action' => 'updateCustomer',
             'service' => 'stripe',
-            'customer_id' => 'cus_ABC123',
-            'monolith_customer_id' => 'test_12345',
-            'name' => 'John Updated',
-            'email' => 'john.updated@example.com',
-            'phone' => '0987654321',
-            'description' => 'Updated customer',
-            'metadata' => ['updated' => true],
-            'status' => 'active', // Include this for DB sync
+            'customer_id' => 'cus_S8JVcWbwI5ZjYa', // updated from your input
+            'monolith_customer_id' => 'cus_ty6654sdf', // updated from your input
+            'name' => 'Vignesh18', // updated
+            'email' => 'vigneshcs18172@gmail.com', // updated
+            'phone' => '35435', // updated
+            'description' => '', // cleared
+            'metadata' => [], // cleared
+            'status' => 'active', // keeping from original for DB sync
 
-            'address' => [
-                'line1' => '456 New St',
-                'line2' => null,
-                'city' => 'Newville',
-                'state' => 'NV',
-                'country' => 'US',
-                'postal_code' => '67890',
-            ],
-
-            'shipping' => [
-                'name' => 'John Updated',
-                'phone' => '0987654321',
-                'address' => [
-                    'line1' => '456 New Shipping Ln',
-                    'line2' => null,
-                    'city' => 'NewShipCity',
-                    'state' => 'NS',
-                    'country' => 'US',
-                    'postal_code' => '98765',
-                ]
-            ],
-
-            'payment_method' => 'pm_card_mastercard',
-            'tax' => ['vat' => '987654321'],
-            'balance' => 2000,
-            'invoice_prefix' => 'UPD',
-            'preferred_locales' => ['en', 'fr'],
-            'promotion_code' => null,
-            'tax_exempt' => 'exempt',
-
+            'address' => [], // cleared
+            'shipping' => [], // cleared
+            'tax' => [], // cleared
+            'balance' => '', // cleared
+            'cash_balance' => '', // new field from your input
+            'default_source' => '', // new field from your input
+            'invoice_prefix' => '', // cleared
+            'invoice_settings' => [], // new field from your input
+            'next_invoice_sequence' => '', // new field from your input
+            'preferred_locales' => [], // cleared
+            'source' => '', // new field from your input
+            'tax_exempt' => '', // cleared
         ], $data);
 
-        return $this->sendRequest($data, 'customer');
+        return $this->sendRequest($data, 'customers');
     }
 
     public function retrieveCustomer(array $data = [])
@@ -128,10 +99,10 @@ class StripeService
         $data = array_merge([
             'action' => 'retrieveCustomer',
             'service' => 'stripe',
-            'customer_id' => 'cus_ABC123',
+            'customer_id' => 'cus_S8JVcWbwI5ZjYa',
         ], $data);
 
-        return $this->sendRequest($data, 'customer');
+        return $this->sendRequest($data, 'customers');
     }
 
     public function deleteCustomer(array $data = [])
@@ -139,10 +110,10 @@ class StripeService
         $data = array_merge([
             'action' => 'deleteCustomer',
             'service' => 'stripe',
-            'customer_id' => 'cus_ABC123',
+            'customer_id' => 'cus_S8JVcWbwI5ZjYa',
         ], $data);
 
-        return $this->sendRequest($data, 'customer');
+        return $this->sendRequest($data, 'customers');
     }
 
     public function listCustomers(array $data = [])
@@ -153,7 +124,7 @@ class StripeService
             'limit' => 5,
         ], $data);
 
-        return $this->sendRequest($data, 'customer');
+        return $this->sendRequest($data, 'customers');
     }
 
     public function searchCustomer(array $data = [])
@@ -161,11 +132,11 @@ class StripeService
         $data = array_merge([
             'action' => 'searchCustomer',
             'service' => 'stripe',
-            'query' => 'email:"john.doe@example.com"',
+            'query' => 'name:"vignesh"',
             'limit' => 3,
         ], $data);
 
-        return $this->sendRequest($data, 'customer');
+        return $this->sendRequest($data, 'customers');
     }
 
     // ==========================
@@ -211,7 +182,7 @@ class StripeService
         $data = array_merge([
             'action' => 'updateCharge',
             'service' => 'stripe',
-            'charge_id' => 'ch_xxxx',  // Charge ID
+            'charge_id' => 'ch_3RE3PRS0vtd2x8w91LCHcTof',  // Charge ID
             'metadata' => ['updated' => true],
             'description' => 'Updated charge description',
         ], $data);
@@ -224,7 +195,7 @@ class StripeService
         $data = array_merge([
             'action' => 'retrieveCharge',
             'service' => 'stripe',
-            'charge_id' => 'ch_xxxx',  // Charge ID
+            'charge_id' => 'ch_3RE3PRS0vtd2x8w91LCHcTof',  // Charge ID
         ], $data);
 
         return $this->sendRequest($data, 'charges');
@@ -246,7 +217,7 @@ class StripeService
         $data = array_merge([
             'action' => 'captureCharge',
             'service' => 'stripe',
-            'charge_id' => 'ch_xxxx',  // Charge ID
+            'charge_id' => 'ch_3RE3PRS0vtd2x8w91LCHcTof',  // Charge ID
             'amount' => 1500,           // Amount to capture, optional
             'receipt_email' => 'john.doe@example.com',
             'statement_descriptor' => 'Captured charge',
@@ -271,7 +242,7 @@ class StripeService
         $data = array_merge([
             'action' => 'searchCharges',
             'service' => 'stripe',
-            'query' => 'amount:500',
+            'query' => 'metadata["order_id"]:"ORD12345"',
             'limit' => 5,  // Default limit for search
         ], $data);
 
@@ -287,7 +258,26 @@ class StripeService
         $data = array_merge([
             'action' => 'createSetupIntent',
             'service' => 'stripe',
-            'payment_method_types' => ['card'],
+
+            'automatic_payment_methods' => '',
+            // 'confirm' => 1, // Uncomment if needed
+            'customer' => '',
+            'description' => '',
+            'metadata' => [],
+            'payment_method' => '',
+            'usage' => '',
+            'attach_to_self' => '',
+            'confirmation_token' => '',
+            'flow_directions' => [],
+            'mandate_data' => [],
+            'on_behalf_of' => '',
+            'payment_method_configuration' => '',
+            'payment_method_data' => [],
+            'payment_method_options' => [],
+            'payment_method_types' => ['card'], // already present
+            'return_url' => '',
+            'single_use' => '',
+            'use_stripe_sdk' => '',
         ], $data);
 
         return $this->sendRequest($data, 'setup-intents');
@@ -298,7 +288,7 @@ class StripeService
         $data = array_merge([
             'action' => 'retrieveSetupIntent',
             'service' => 'stripe',
-            'setup_intent_id' => 'seti_ABC123',
+            'setup_intent_id' => 'seti_1RE3sqS0vtd2x8w9qt4ESYDn',
         ], $data);
 
         return $this->sendRequest($data, 'setup-intents');
@@ -309,7 +299,18 @@ class StripeService
         $data = array_merge([
             'action' => 'updateSetupIntent',
             'service' => 'stripe',
-            'setup_intent_id' => 'seti_ABC123',
+            'setup_intent_id' => 'seti_1R7D1ZS0vtd2x8w9HUbloAU7', // updated ID from your input
+
+            'customer' => '',
+            'description' => '',
+            'metadata' => [],
+            'payment_method' => '',
+            'attach_to_self' => '',
+            'flow_directions' => [],
+            'payment_method_configuration' => '',
+            'payment_method_data' => [],
+            'payment_method_options' => [],
+            'payment_method_types' => [],
         ], $data);
 
         return $this->sendRequest($data, 'setup-intents');
@@ -320,7 +321,7 @@ class StripeService
         $data = array_merge([
             'action' => 'cancelSetupIntent',
             'service' => 'stripe',
-            'setup_intent_id' => 'seti_ABC123',
+            'setup_intent_id' => 'seti_1RE3sqS0vtd2x8w9qt4ESYDn',
         ], $data);
 
         return $this->sendRequest($data, 'setup-intents');
@@ -335,8 +336,15 @@ class StripeService
         $data = array_merge([
             'action' => 'confirmSetupIntent',
             'service' => 'stripe',
-            'setup_intent_id' => 'seti_ABC123',
-            'payment_method' => 'pm_card_visa',  // example
+            'setup_intent_id' => 'seti_1RE4QSS0vtd2x8w9HEJwqwTd', // updated from input
+            'payment_method' => 'pm_card_visa', // updated from input
+
+            'confirmation_token' => '',
+            'mandate_data' => [],
+            'payment_method_data' => [],
+            'payment_method_options' => [],
+            'return_url' => '',
+            'use_stripe_sdk' => '',
         ], $data);
 
         return $this->sendRequest($data, 'setup-intents');
@@ -347,9 +355,9 @@ class StripeService
         $data = array_merge([
             'action' => 'verifyMicrodeposits',
             'service' => 'stripe',
-            'setup_intent_id' => 'seti_ABC123',
-            'amounts' => [0.1, 0.2],
-            'descriptor_code' => '1234',
+            'setup_intent_id' => 'seti_1RE4QSS0vtd2x8w9HEJwqwTd',
+            'amounts' => [100, 200],
+            'descriptor_code' => 'SM1234',
         ], $data);
 
         return $this->sendRequest($data, 'setup-intents');
@@ -375,27 +383,37 @@ class StripeService
         $data = array_merge([
             'action' => 'createPaymentIntent',
             'service' => 'stripe',
-            'amount' => 1500,
-            'currency' => 'usd',
-            'payment_method_types' => ['card'],
-            'customer' => null,
-            'description' => 'Test payment intent',
-            'metadata' => ['source' => 'testing'],
-            'receipt_email' => 'john.doe@example.com',
-            'shipping' => [
-                'name' => 'John Doe',
-                'phone' => '1234567890',
-                'address' => [
-                    'line1' => '123 Shipping Ln',
-                    'city' => 'ShipCity',
-                    'state' => 'SC',
-                    'country' => 'US',
-                    'postal_code' => '54321',
-                ],
-            ],
-            'statement_descriptor' => 'TestCharge',
-            'transfer_data' => null,
-            'capture_method' => 'automatic',
+            'amount' => 10000, // updated from your input
+            'currency' => 'USD',
+
+            'automatic_payment_methods' => [],
+            'confirm' => '',
+            'customer' => '',
+            'description' => '',
+            'metadata' => [],
+            'off_session' => '',
+            'payment_method' => '',
+            'receipt_email' => '',
+            'setup_future_usage' => '',
+            'shipping' => [],
+            'statement_descriptor' => '',
+            'statement_descriptor_suffix' => '',
+            'application_fee_amount' => '',
+            'capture_method' => '',
+            'confirmation_method' => '',
+            'confirmation_token' => '',
+            'error_on_requires_action' => '',
+            'mandate' => '',
+            'mandate_data' => [],
+            'on_behalf_of' => '',
+            'payment_method_configuration' => '',
+            'payment_method_data' => [],
+            'payment_method_options' => [],
+            'payment_method_types' => [],
+            'radar_options' => [],
+            'transfer_data' => '',
+            'transfer_group' => '',
+            'use_stripe_sdk' => '',
         ], $data);
 
         return $this->sendRequest($data, 'payment-intents');
@@ -406,21 +424,27 @@ class StripeService
         $data = array_merge([
             'action' => 'updatePaymentIntent',
             'service' => 'stripe',
-            'payment_intent_id' => 'pi_ABC123',
-            'amount' => 1600,
-            'description' => 'Updated payment intent description',
-            'metadata' => ['updated' => true],
-            'shipping' => [
-                'name' => 'John Updated',
-                'phone' => '0987654321',
-                'address' => [
-                    'line1' => '456 New Shipping Ln',
-                    'city' => 'NewShipCity',
-                    'state' => 'NS',
-                    'country' => 'US',
-                    'postal_code' => '98765',
-                ],
-            ],
+            'payment_intent_id' => 'pi_3R7Y7wS0vtd2x8w91jhEyrQu', // updated from your input
+
+            'amount' => '',
+            'currency' => '',
+            'customer' => '',
+            'description' => '',
+            'metadata' => [],
+            'payment_method' => '',
+            'receipt_email' => '',
+            'setup_future_usage' => '',
+            'shipping' => [],
+            'statement_descriptor' => '',
+            'statement_descriptor_suffix' => '',
+            'application_fee_amount' => '',
+            'capture_method' => '',
+            'payment_method_configuration' => '',
+            'payment_method_data' => [],
+            'payment_method_options' => [],
+            'payment_method_types' => [],
+            'transfer_data' => '',
+            'transfer_group' => '',
         ], $data);
 
         return $this->sendRequest($data, 'payment-intents');
@@ -431,7 +455,7 @@ class StripeService
         $data = array_merge([
             'action' => 'retrievePaymentIntent',
             'service' => 'stripe',
-            'payment_intent_id' => 'pi_ABC123',
+            'payment_intent_id' => 'pi_3RE4WfS0vtd2x8w90okObr2i',
         ], $data);
 
         return $this->sendRequest($data, 'payment-intents');
@@ -442,7 +466,7 @@ class StripeService
         $data = array_merge([
             'action' => 'cancelPaymentIntent',
             'service' => 'stripe',
-            'payment_intent_id' => 'pi_ABC123',
+            'payment_intent_id' => 'pi_3RE4zVS0vtd2x8w90Qb9aGFI',
             'cancellation_reason' => 'requested_by_customer',
         ], $data);
 
@@ -454,7 +478,7 @@ class StripeService
         $data = array_merge([
             'action' => 'capturePaymentIntent',
             'service' => 'stripe',
-            'payment_intent_id' => 'pi_ABC123',
+            'payment_intent_id' => 'pi_3RE4WfS0vtd2x8w90okObr2i',
             'amount_to_capture' => 1500,  // Optional: specify the amount to capture
         ], $data);
 
@@ -466,7 +490,7 @@ class StripeService
         $data = array_merge([
             'action' => 'confirmPaymentIntent',
             'service' => 'stripe',
-            'payment_intent_id' => 'pi_ABC123',
+            'payment_intent_id' => 'pi_3RE4WfS0vtd2x8w90okObr2i',
             'payment_method' => 'pm_card_visa', // Example of payment method
         ], $data);
 
@@ -476,7 +500,7 @@ class StripeService
     public function searchPaymentIntents(array $data = [])
     {
         $data = array_merge([
-            'action' => 'searchPaymentIntents',
+            'action' => 'searchPaymentIntent',
             'service' => 'stripe',
             'query' => 'amount:500',  // Example search query
             'limit' => 5,  // Default limit for search
@@ -488,11 +512,11 @@ class StripeService
     public function verifyPaymentIntentMicrodeposits(array $data = [])
     {
         $data = array_merge([
-            'action' => 'verifyPaymentIntentMicrodeposits',
+            'action' => 'verifyMicrodeposits',
             'service' => 'stripe',
-            'payment_intent_id' => 'pi_ABC123',
-            'amounts' => [0.1, 0.2], // Example of microdeposit amounts
-            'descriptor_code' => '1234', // Optional: descriptor code for microdeposit verification
+            'payment_intent_id' => 'pi_3R7XB6S0vtd2x8w91s9M2NZQ', // updated ID
+            'amounts' => [32, 45], // from input
+            'descriptor_code' => '', // empty as per input
         ], $data);
 
         return $this->sendRequest($data, 'payment-intents');
@@ -507,7 +531,7 @@ class StripeService
         $data = array_merge([
             'action' => 'incrementAuthorization',
             'service' => 'stripe',
-            'payment_intent_id' => 'pi_ABC123',
+            'payment_intent_id' => 'pi_3RE4WfS0vtd2x8w90okObr2i',
             'amount' => 1000,  // The amount to increase the authorization by
         ], $data);
 
@@ -523,7 +547,7 @@ class StripeService
         $data = array_merge([
             'action' => 'applyCustomerBalance',
             'service' => 'stripe',
-            'payment_intent_id' => 'pi_ABC123',
+            'payment_intent_id' => 'pi_3RE4WfS0vtd2x8w90okObr2i',
         ], $data);
 
         return $this->sendRequest($data, 'payment-intents');
@@ -553,16 +577,18 @@ class StripeService
         $data = array_merge([
             'action' => 'createRefund',
             'service' => 'stripe',
-            'charge' => 'ch_1IwGVF2eZvKYlo2C1B09sYsY', // Example charge ID
-            'payment_intent' => null,
-            'amount' => 1000,  // Optional: Amount to refund
-            'reason' => 'requested_by_customer',
-            'metadata' => null,
+            'charge' => 'ch_3RE5JXS0vtd2x8w91X9BHW0U', // updated from input
+            'amount' => 100, // updated from input
+            'metadata' => [],
+            // 'payment_intent' => '3242', // updated from input
+            'reason' => '',
+            'instructions_email' => '',
+            'origin' => '',
             'refund_application_fee' => false,
             'reverse_transfer' => false,
         ], $data);
 
-        return $this->sendRequest($data, 'refunds');
+        return $this->sendRequest($data, 'refund');
     }
 
     public function updateRefund(array $data = [])
@@ -570,11 +596,11 @@ class StripeService
         $data = array_merge([
             'action' => 'updateRefund',
             'service' => 'stripe',
-            'refund_id' => 're_ABC123', // Example refund ID
+            'refund_id' => 're_3RE5JXS0vtd2x8w910O8IzZj', // Example refund ID
             'metadata' => ['updated' => true], // Update metadata
         ], $data);
 
-        return $this->sendRequest($data, 'refunds');
+        return $this->sendRequest($data, 'refund');
     }
 
     public function retrieveRefund(array $data = [])
@@ -582,10 +608,10 @@ class StripeService
         $data = array_merge([
             'action' => 'retrieveRefund',
             'service' => 'stripe',
-            'refund_id' => 're_ABC123',  // Refund ID
+            'refund_id' => 're_3RE5JXS0vtd2x8w910O8IzZj',  // Refund ID
         ], $data);
 
-        return $this->sendRequest($data, 'refunds');
+        return $this->sendRequest($data, 'refund');
     }
 
     public function listRefunds(array $data = [])
@@ -598,7 +624,7 @@ class StripeService
             'payment_intent' => null, // Optional: pass payment intent ID to filter
         ], $data);
 
-        return $this->sendRequest($data, 'refunds');
+        return $this->sendRequest($data, 'refund');
     }
 
     public function cancelRefund(array $data = [])
@@ -606,10 +632,10 @@ class StripeService
         $data = array_merge([
             'action' => 'cancelRefund',
             'service' => 'stripe',
-            'refund_id' => 're_ABC123',  // Refund ID
+            'refund_id' => 're_3RE5JXS0vtd2x8w910O8IzZj',  // Refund ID
         ], $data);
 
-        return $this->sendRequest($data, 'refunds');
+        return $this->sendRequest($data, 'refund');
     }
 
     // ==========================
@@ -621,7 +647,7 @@ class StripeService
         $data = array_merge([
             'action' => 'createPaymentMethod',
             'service' => 'stripe',
-            'type' => 'card', // Example type, you can change this dynamically
+            'type' => 'us_bank_account', // Example type, you can change this dynamically
             'billing_details' => [
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.com',
@@ -635,21 +661,26 @@ class StripeService
                 ],
             ],
             'metadata' => null,
-            'card' => [
-                'number' => '4242424242424242',
-                'exp_month' => 12,
-                'exp_year' => 2025,
-                'cvc' => '123',
+            'us_bank_account' => [
+                'account_holder_type' => 'individual',
+                'account_number' => '000123456789',
+                'routing_number' => '110000000',
             ],
-            'acss_debit' => null, // Add additional fields based on type
-            'affirm' => null,
-            'afterpay_clearpay' => null,
+            // 'card' => [
+            //     'number' => '4242424242424242',
+            //     'exp_month' => 12,
+            //     'exp_year' => 2025,
+            //     'cvc' => '123',
+            // ],
+            'acss_debit' => [], // Add additional fields based on type
+            'affirm' => [],
+            'afterpay_clearpay' => [],
             'alipay' => null,
-            'alma' => null,
-            'amazon_pay' => null,
+            'alma' => [],
+            'amazon_pay' => [],
             'au_becs_debit' => null,
-            'bacs_debit' => null,
-            'bancontact' => null,
+            'bacs_debit' => [],
+            'bancontact' => [],
             'blik' => null,
             'boleto' => null,
             'cashapp' => null,
@@ -658,10 +689,10 @@ class StripeService
             'fpx' => null,
             'giropay' => null,
             'grabpay' => null,
-            'ideal' => null,
+            'ideal' => [],
             'interac_present' => null,
             'kakao_pay' => null,
-            'klarna' => null,
+            'klarna' => [],
             'konbini' => null,
             'kr_card' => null,
             'link' => null,
@@ -674,17 +705,16 @@ class StripeService
             'pay_by_bank' => null,
             'payco' => null,
             'paynow' => null,
-            'paypal' => null,
+            'paypal' => [],
             'pix' => null,
             'promptpay' => null,
             'radar_options' => null,
             'revolut_pay' => null,
             'samsung_pay' => null,
-            'sepa_debit' => null,
-            'sofort' => null,
+            'sepa_debit' => [],
+            'sofort' => [],
             'swish' => null,
             'twint' => null,
-            'us_bank_account' => null,
             'wechat_pay' => null,
             'zip' => null,
         ], $data);
@@ -697,12 +727,15 @@ class StripeService
         $data = array_merge([
             'action' => 'updatePaymentMethod',
             'service' => 'stripe',
-            'payment_method_id' => 'pm_ABC123', // Example payment method ID
-            'billing_details' => [
-                'name' => 'John Updated',
-                'email' => 'john.updated@example.com',
-            ],
-            'metadata' => ['updated' => true],
+            'payment_method_id' => 'pm_1RE5ksS0vtd2x8w9ZvirOBXw', // updated from input
+
+            'billing_details' => [], // cleared
+            'metadata' => [],
+            'allow_redisplay' => '',
+            'card' => [],
+            'link' => [],
+            'pay_by_bank' => [],
+            'us_bank_account' => [],
         ], $data);
 
         return $this->sendRequest($data, 'payment-methods');
@@ -713,7 +746,7 @@ class StripeService
         $data = array_merge([
             'action' => 'retrievePaymentMethod',
             'service' => 'stripe',
-            'payment_method_id' => 'pm_ABC123',  // Payment Method ID
+            'payment_method_id' => 'pm_1RE5ksS0vtd2x8w9ZvirOBXw',  // Payment Method ID
         ], $data);
 
         return $this->sendRequest($data, 'payment-methods');
@@ -735,8 +768,8 @@ class StripeService
         $data = array_merge([
             'action' => 'attachPaymentMethod',
             'service' => 'stripe',
-            'payment_method_id' => 'pm_ABC123',
-            'customer_id' => 'cus_ABC123',
+            'payment_method_id' => 'pm_1RE5ksS0vtd2x8w9ZvirOBXw',
+            'customer_id' => 'cus_S8Mu3YNTxaQ9J8',
         ], $data);
 
         return $this->sendRequest($data, 'payment-methods');
@@ -747,7 +780,8 @@ class StripeService
         $data = array_merge([
             'action' => 'detachPaymentMethod',
             'service' => 'stripe',
-            'payment_method_id' => 'pm_ABC123',
+            'payment_method_id' => 'pm_1RE5ksS0vtd2x8w9ZvirOBXw',
+            'payment_method' => 'card',
         ], $data);
 
         return $this->sendRequest($data, 'payment-methods');
@@ -758,7 +792,7 @@ class StripeService
         $data = array_merge([
             'action' => 'reinstatePaymentMethod',
             'service' => 'stripe',
-            'payment_method_id' => 'pm_ABC123',
+            'payment_method_id' => 'pm_1RE5ksS0vtd2x8w9ZvirOBXw',
         ], $data);
 
         return $this->sendRequest($data, 'payment-methods');
@@ -769,8 +803,8 @@ class StripeService
         $data = array_merge([
             'action' => 'retrieveCustomerPaymentMethod',
             'service' => 'stripe',
-            'customer_id' => 'cus_ABC123',  // Example customer ID
-            'payment_method_id' => 'pm_ABC123',  // Example payment method ID
+            'customer_id' => 'cus_S8Mu3YNTxaQ9J8',  // Example customer ID
+            'payment_method_id' => 'pm_1RE5ksS0vtd2x8w9ZvirOBXw',  // Example payment method ID
         ], $data);
 
         return $this->sendRequest($data, 'payment-methods');
@@ -781,7 +815,7 @@ class StripeService
         $data = array_merge([
             'action' => 'listCustomerPaymentMethods',
             'service' => 'stripe',
-            'customer_id' => 'cus_ABC123',  // Example customer ID
+            'customer_id' => 'cus_S8Mu3YNTxaQ9J8',  // Example customer ID
             'limit' => 5,  // Default limit, you can customize
         ], $data);
 
@@ -797,16 +831,42 @@ class StripeService
         $data = array_merge([
             'action' => 'createPaymentLink',
             'service' => 'stripe',
-            'line_items' => [], // Example empty line items, adjust as needed
             'currency' => 'usd',
-            'payment_method_types' => ['card'],
-            'customer_email' => 'john.doe@example.com',
-            'allow_promotion_codes' => true,
-            'payment_intent_data' => null,
+
+            'line_items' => [
+                [
+                    'price' => 'price_1R904WS0vtd2x8w9RUaORMNx',
+                    'quantity' => 2,
+                ]
+            ],
+
+            'metadata' => [
+                'order_id' => 'IWER234',
+            ],
             'after_completion' => null,
-            'shipping_address_collection' => null,
-            'metadata' => [],
+            'allow_promotion_codes' => '',
+            'application_fee_amount' => '',
+            'application_fee_percent' => '',
+            'automatic_tax' => [],
+            'billing_address_collection' => '',
+            'consent_collection' => [],
             'custom_fields' => [],
+            'custom_text' => [],
+            'customer_creation' => '',
+            'inactive_message' => '',
+            'invoice_creation' => [],
+            'on_behalf_of' => '',
+            'optional_items' => [],
+            'payment_intent_data' => [],
+            'payment_method_collection' => '',
+            'payment_method_types' => ['card'],
+            'phone_number_collection' => [],
+            'restrictions' => [],
+            'shipping_address_collection' => [],
+            'shipping_options' => [],
+            'submit_type' => '',
+            'subscription_data' => [],
+            'tax_id_collection' => [],
         ], $data);
 
         return $this->sendRequest($data, 'payment-links');
@@ -817,17 +877,28 @@ class StripeService
         $data = array_merge([
             'action' => 'updatePaymentLink',
             'service' => 'stripe',
-            'payment_link_id' => 'link_ABC123',  // Example payment link ID
-            'line_items' => [],
-            'currency' => 'usd',
-            'payment_method_types' => ['card'],
-            'customer_email' => 'john.doe@example.com',
-            'allow_promotion_codes' => true,
-            'payment_intent_data' => null,
-            'after_completion' => null,
-            'shipping_address_collection' => null,
+            'payment_link_id' => 'plink_1RBweOS0vtd2x8w9a8k9JBg0', // updated from input
+            'active' => '',
+            'line_items' => '',
             'metadata' => [],
+            'after_completion' => null,
+            'allow_promotion_codes' => '',
+            'automatic_tax' => [],
+            'billing_address_collection' => '',
             'custom_fields' => [],
+            'custom_text' => [],
+            'customer_creation' => '',
+            'inactive_message' => '',
+            'invoice_creation' => [],
+            'payment_intent_data' => [],
+            'payment_method_collection' => '',
+            'payment_method_types' => ['card'],
+            'phone_number_collection' => [],
+            'restrictions' => [],
+            'shipping_address_collection' => [],
+            'submit_type' => '',
+            'subscription_data' => [],
+            'tax_id_collection' => [],
         ], $data);
 
         return $this->sendRequest($data, 'payment-links');
@@ -838,7 +909,7 @@ class StripeService
         $data = array_merge([
             'action' => 'retrievePaymentLink',
             'service' => 'stripe',
-            'payment_link_id' => 'link_ABC123', // Example payment link ID
+            'payment_link_id' => 'plink_1RBweOS0vtd2x8w9a8k9JBg0', // Example payment link ID
         ], $data);
 
         return $this->sendRequest($data, 'payment-links');
@@ -860,7 +931,7 @@ class StripeService
         $data = array_merge([
             'action' => 'retrieveLineItems',
             'service' => 'stripe',
-            'payment_link_id' => 'link_ABC123',  // Example payment link ID
+            'payment_link_id' => 'plink_1RBweOS0vtd2x8w9a8k9JBg0',  // Example payment link ID
         ], $data);
 
         return $this->sendRequest($data, 'payment-links');
@@ -875,24 +946,27 @@ class StripeService
         $data = array_merge([
             'action' => 'createPrice',
             'service' => 'stripe',
-            'currency' => 'usd', // Currency for price
-            'active' => true,
-            'metadata' => null,
-            'nickname' => 'Example Price',
-            'product' => 'prod_ABC123', // Example product ID
-            'recurring' => null, // If recurring price, provide the recurring options
-            'tax_behavior' => 'exclusive', // Example tax behavior
-            'unit_amount' => 1000, // Example price in cents
-            'billing_scheme' => 'per_unit', // Per unit pricing scheme
-            'currency_options' => null,
-            'custom_unit_amount' => null,
-            'lookup_key' => null,
-            'product_data' => null,
-            'tiers' => null,
-            'tiers_mode' => null,
-            'transfer_lookup_key' => null,
-            'transform_quantity' => null,
-            'unit_amount_decimal' => null,
+            'currency' => 'usd',
+            'product_data' => [
+                'name' => 'Gold', // From input
+            ],
+            // 'unit_amount' => 10000, // From input
+            'active' => '',
+            'metadata' => [],
+            'nickname' => '',
+            // 'product' => '', // intentionally excluded as commented in input
+            'recurring' => [],
+            'tax_behavior' => '',
+            'billing_scheme' => '',
+            'currency_options' => [],
+            'custom_unit_amount' => [],
+            'lookup_key' => '',
+            // 'product_data' => [], // already used above
+            'tiers' => [],
+            'tiers_mode' => '',
+            'transfer_lookup_key' => '',
+            'transform_quantity' => [],
+            'unit_amount_decimal' => '1000.0',
         ], $data);
 
         return $this->sendRequest($data, 'prices');
@@ -903,7 +977,7 @@ class StripeService
         $data = array_merge([
             'action' => 'updatePrice',
             'service' => 'stripe',
-            'price_id' => 'price_ABC123', // Example price ID
+            'price_id' => 'price_1RE6TES0vtd2x8w99gudpdXb', // Example price ID
             'active' => true,
             'metadata' => null,
             'nickname' => 'Updated Price',
@@ -921,7 +995,7 @@ class StripeService
         $data = array_merge([
             'action' => 'retrievePrice',
             'service' => 'stripe',
-            'price_id' => 'price_ABC123',  // Price ID
+            'price_id' => 'price_1RE6TES0vtd2x8w99gudpdXb',  // Price ID
         ], $data);
 
         return $this->sendRequest($data, 'prices');
@@ -941,9 +1015,9 @@ class StripeService
     public function searchPrice(array $data = [])
     {
         $data = array_merge([
-            'action' => 'searchPrice',
+            'action' => 'searchPrices',
             'service' => 'stripe',
-            'query' => 'product_id:"prod_ABC123"', // Example search query
+            'query' => 'metadata["order_id"]:"34"', // Example search query
             'limit' => 5, // Default limit for search
         ], $data);
 

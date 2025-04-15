@@ -28,13 +28,13 @@ class RefundController extends Controller
         return response()->json($response);
     }
 
-    public function retrieve(Request $request, string $refund_id)
+    public function retrieve(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
         // Pass the refund_id to retrieve refund details
-        $response = $paymentService->retrieveRefund(['refund_id' => $refund_id]);
+        $response = $paymentService->retrieveRefund();
         return response()->json($response);
     }
 
@@ -48,13 +48,13 @@ class RefundController extends Controller
         return response()->json($response);
     }
 
-    public function cancel(Request $request, string $refund_id)
+    public function cancel(Request $request)
     {
         $service = $request->input('service', 'stripe');
         $paymentService = PaymentServiceStrategy::getStrategy($service);
 
         // Pass the refund_id to cancel the refund
-        $response = $paymentService->cancelRefund(['refund_id' => $refund_id]);
+        $response = $paymentService->cancelRefund();
         return response()->json($response);
     }
 }
