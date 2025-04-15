@@ -2,6 +2,7 @@
 
 namespace App\Strategies\Payment;
 
+use App\Services\Payment\GoCardlessService;
 use App\Services\Payment\StripeService;
 use Exception;
 
@@ -17,7 +18,8 @@ class PaymentServiceStrategy
     public static function getStrategy(string $service)
     {
         return match (strtolower($service)) {
-            'stripe'     => app(StripeService::class),
+            'stripe'         => app(StripeService::class),
+            'gocardless'     => app(GoCardlessService::class),
             default      => throw new Exception("Unsupported payment service: $service"),
         };
     }
