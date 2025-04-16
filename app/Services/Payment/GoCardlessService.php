@@ -891,26 +891,121 @@ class GoCardlessService
 
     public function createPrice(array $data = [])
     {
+        $data = array_merge([
+            'action' => 'createPrice',
+            'service' => 'gocardless',
+
+            // Required fields
+            'currency' => 'usd',
+            'product_data' => [
+                'name' => 'Gold'
+            ],
+            'unit_amount' => 10000,
+
+            // New fields (with placeholders to be filled)
+            'active' => null,  // Optional: Set whether the price is active
+            'metadata' => [],  // Optional: Custom metadata for the price
+            'nickname' => null,  // Optional: Nickname for the price
+            'product' => '5436',  // Optional: Product ID or reference
+            'recurring' => null,  // Optional: Set if recurring
+            'tax_behavior' => null,  // Optional: Set tax behavior (e.g., exclusive or inclusive)
+            'billing_scheme' => null,  // Optional: Billing scheme for pricing
+            'currency_options' => null,  // Optional: Currency options
+            'custom_unit_amount' => null,  // Optional: Custom unit amount
+            'lookup_key' => null,  // Optional: Lookup key for the price
+            'tiers' => null,  // Optional: Pricing tiers
+            'tiers_mode' => null,  // Optional: Mode for pricing tiers
+            'transfer_lookup_key' => null,  // Optional: Transfer lookup key
+            'transform_quantity' => null,  // Optional: Quantity transformation
+            'unit_amount_decimal' => null,  // Optional: Decimal unit amount
+
+        ], $data);
+
         return $this->sendRequest($data, 'prices');
     }
 
     public function updatePrice(array $data = [])
     {
+        $data = array_merge([
+            'action' => 'updatePrice',
+            'service' => 'gocardless',
+
+            // Required fields
+            'price_id' => 'price_1R904WS0vtd2x8w9RUaORMNx', // Set the actual price_id here
+
+            // New fields
+            'metadata' => [
+                'order_id' => 34, // Set the order_id here
+            ],
+            'active' => null,  // Optional: Set whether the price is active
+            'nickname' => null,  // Optional: Nickname for the price
+            'tax_behavior' => null,  // Optional: Tax behavior (e.g., exclusive or inclusive)
+            'currency_options' => null,  // Optional: Currency options
+            'lookup_key' => null,  // Optional: Lookup key for the price
+            'transfer_lookup_key' => null,  // Optional: Transfer lookup key
+
+        ], $data);
+
         return $this->sendRequest($data, 'prices');
     }
 
     public function retrievePrice(array $data = [])
     {
+
+        $data = array_merge([
+            'action' => 'retrievePrice',
+            'service' => 'gocardless',
+
+            // Required fields
+            'price_id' => 'price_1R904WS0vtd2x8w9RUaORMNx', // Replace with the actual price_id
+
+        ], $data);
+
         return $this->sendRequest($data, 'prices');
     }
 
-    public function listPrices(array $filters = [])
+    public function listPrices(array $data = [])
     {
+        $data = array_merge([
+            'action' => 'listPrices',
+            'service' => 'gocardless',
+
+            // Optional fields
+            'active' => null,  // Optional: Set whether the prices are active
+            'currency' => null,  // Optional: Currency filter (e.g., 'usd')
+            'product' => null,  // Optional: Product ID or reference
+            'type' => null,  // Optional: Price type (e.g., one-time, recurring)
+            'created' => null,  // Optional: Filter by creation date
+            'ending_before' => null,  // Optional: Ending date or pagination filter
+            'limit' => null,  // Optional: Limit the number of results
+            'lookup_keys' => null,  // Optional: Lookup keys for filtering
+            'recurring' => null,  // Optional: Set if recurring
+            'starting_after' => null,  // Optional: Starting date or pagination filter
+
+        ], $data);
+
         return $this->sendRequest($data, 'prices');
     }
 
-    public function searchPrice(array $filters = [])
+    public function searchPrice(array $data = [])
     {
+        $data = array_merge([
+            'action' => 'searchPrices',
+            'service' => 'gocardless',
+
+            // Required fields
+            'monolith_customer_id' => 'cus_ty6654sdf',  // Replace with the actual customer ID
+            'type' => 2,  // Set to the desired customer type (e.g., '2')
+            'name' => 'Vignesh',  // Customer's name
+            'email' => 'vigneshcs18172@gmail.com',  // Customer's email
+            'query' => 'Avoo',
+            // Optional fields
+            'phone' => null,  // Optional: Customer's phone number
+            'billing_currency_id' => null,  // Optional: Billing currency ID
+            'business_registration_number' => null,  // Optional: Customer's business registration number
+
+        ], $data);
+
         return $this->sendRequest($data, 'prices');
     }
 }
