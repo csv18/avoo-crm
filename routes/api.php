@@ -19,7 +19,7 @@ Route::prefix('customer')->group(function () {
     Route::post('/update', [CustomerController::class, 'update']);
     Route::post('/retrieve', [CustomerController::class, 'retrieve']);
     Route::post('/delete', [CustomerController::class, 'delete']);
-    Route::get('/list', [CustomerController::class, 'list']);
+    Route::post('/list', [CustomerController::class, 'list']);
     Route::post('/search', [CustomerController::class, 'search']);
 });
 
@@ -28,7 +28,7 @@ Route::prefix('charge')->group(function () {
     Route::post('/create', [ChargeController::class, 'create']);
     Route::post('/update', [ChargeController::class, 'update']);
     Route::post('/retrieve', [ChargeController::class, 'retrieve']);
-    Route::get('/list', [ChargeController::class, 'list']);
+    Route::post('/list', [ChargeController::class, 'list']);
     Route::post('/capture', [ChargeController::class, 'capture']);
     Route::post('/cancel', [ChargeController::class, 'cancel']);
     Route::post('/search', [ChargeController::class, 'search']);
@@ -54,7 +54,7 @@ Route::prefix('setup-intent')->group(function () {
     Route::post('/verify-microdeposits', [SetupIntentController::class, 'verifyMicrodeposits']);
 
     // List all SetupIntents
-    Route::get('/list', [SetupIntentController::class, 'list']);
+    Route::post('/list', [SetupIntentController::class, 'list']);
 });
 
 Route::prefix('payment-intents')->group(function () {
@@ -64,7 +64,7 @@ Route::prefix('payment-intents')->group(function () {
     Route::post('/cancel', [PaymentIntentController::class, 'cancel']); // Cancel a PaymentIntent
     Route::post('/capture', [PaymentIntentController::class, 'capture']); // Capture a PaymentIntent
     Route::post('/confirm', [PaymentIntentController::class, 'confirm']); // Confirm a PaymentIntent
-    Route::get('list', [PaymentIntentController::class, 'list']); // List PaymentIntents
+    Route::post('list', [PaymentIntentController::class, 'list']); // List PaymentIntents
     Route::post('/search', [PaymentIntentController::class, 'search']); // Search PaymentIntents
     Route::post('/increment-authorization', [PaymentIntentController::class, 'incrementAuthorization']); // Increment authorization for PaymentIntent
     Route::post('/apply-customer-balance', [PaymentIntentController::class, 'applyCustomerBalance']); // Apply customer balance to PaymentIntent
@@ -75,7 +75,7 @@ Route::prefix('refund')->group(function () {
     Route::post('/create', [RefundController::class, 'create']);
     Route::post('/update', [RefundController::class, 'update']);
     Route::post('/retrieve', [RefundController::class, 'retrieve']);
-    Route::get('/list', [RefundController::class, 'list']);
+    Route::post('/list', [RefundController::class, 'list']);
     Route::post('/cancel', [RefundController::class, 'cancel']);
 });
 
@@ -90,7 +90,7 @@ Route::prefix('payment-methods')->group(function () {
     Route::post('retrieve', [PaymentMethodController::class, 'retrievePaymentMethod']);
 
     // List all payment methods
-    Route::get('list', [PaymentMethodController::class, 'listPaymentMethods']);
+    Route::post('list', [PaymentMethodController::class, 'listPaymentMethods']);
 
     // Attach a payment method to a customer
     Route::post('attach', [PaymentMethodController::class, 'attachPaymentMethod']);
@@ -112,7 +112,7 @@ Route::prefix('payment-links')->group(function () {
     Route::post('create', [PaymentLinkController::class, 'createPaymentLink']);
     Route::post('update', [PaymentLinkController::class, 'updatePaymentLink']);
     Route::post('retrieve', [PaymentLinkController::class, 'retrievePaymentLink']);
-    Route::get('list', [PaymentLinkController::class, 'listPaymentLinks']);
+    Route::post('list', [PaymentLinkController::class, 'listPaymentLinks']);
     Route::post('retrieve-line-items', [PaymentLinkController::class, 'retrieveLineItems']);
     Route::post('initialise', [PaymentLinkController::class, 'initialisePaymentLink']);
 });
@@ -121,6 +121,6 @@ Route::prefix('price')->group(function () {
     Route::post('create', [PriceController::class, 'createPrice']);
     Route::post('update', [PriceController::class, 'updatePrice']);
     Route::post('retrieve', [PriceController::class, 'retrievePrice']);
-    Route::get('list', [PriceController::class, 'listPrices']);
+    Route::post('list', [PriceController::class, 'listPrices']);
     Route::post('search', [PriceController::class, 'searchPrices']);
 });
