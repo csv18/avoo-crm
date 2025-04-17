@@ -3,63 +3,26 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\RetrieveCustomerRequest;
-use App\Strategies\Payment\PaymentServiceStrategy;
+use App\Strategies\Customer\CustomerServiceStrategy;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    public function create(Request $request)
+    public function createCustomer(Request $request)
     {
-        $service = $request->input('service', 'stripe');
-        $paymentService = PaymentServiceStrategy::getStrategy($service);
+        $service = $request->input('service', 'customer');
+        $paymentService = CustomerServiceStrategy::getStrategy($service);
 
         $response = $paymentService->createCustomer($request->all());
         return response()->json($response);
     }
 
-    public function update(Request $request)
+    public function updateCustomer(Request $request)
     {
-        $service = $request->input('service', 'stripe');
-        $paymentService = PaymentServiceStrategy::getStrategy($service);
+        $service = $request->input('service', 'customer');
+        $paymentService = CustomerServiceStrategy::getStrategy($service);
 
         $response = $paymentService->updateCustomer($request->all());
-        return response()->json($response);
-    }
-
-    public function retrieve(Request $request)
-    {
-        $service = $request->input('service', 'stripe');
-        $paymentService = PaymentServiceStrategy::getStrategy($service);
-
-        $response = $paymentService->retrieveCustomer();
-        return response()->json($response);
-    }
-
-    public function delete(Request $request)
-    {
-        $service = $request->input('service', 'stripe');
-        $paymentService = PaymentServiceStrategy::getStrategy($service);
-
-        $response = $paymentService->deleteCustomer();
-        return response()->json($response);
-    }
-
-    public function list(Request $request)
-    {
-        $service = $request->input('service', 'stripe');
-        $paymentService = PaymentServiceStrategy::getStrategy($service);
-
-        $response = $paymentService->listCustomers($request->all());
-        return response()->json($response);
-    }
-
-    public function search(Request $request)
-    {
-        $service = $request->input('service', 'stripe');
-        $paymentService = PaymentServiceStrategy::getStrategy($service);
-
-        $response = $paymentService->searchCustomer($request->all());
         return response()->json($response);
     }
 }

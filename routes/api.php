@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ChargeController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\PaymentCustomerController;
 use App\Http\Controllers\Api\PaymentIntentController;
 use App\Http\Controllers\Api\PaymentLinkController;
 use App\Http\Controllers\Api\PaymentMethodController;
@@ -15,12 +16,12 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::prefix('customer')->group(function () {
-    Route::post('/create', [CustomerController::class, 'create']);
-    Route::post('/update', [CustomerController::class, 'update']);
-    Route::post('/retrieve', [CustomerController::class, 'retrieve']);
-    Route::post('/delete', [CustomerController::class, 'delete']);
-    Route::post('/list', [CustomerController::class, 'list']);
-    Route::post('/search', [CustomerController::class, 'search']);
+    Route::post('/create', [PaymentCustomerController::class, 'create']);
+    Route::post('/update', [PaymentCustomerController::class, 'update']);
+    Route::post('/retrieve', [PaymentCustomerController::class, 'retrieve']);
+    Route::post('/delete', [PaymentCustomerController::class, 'delete']);
+    Route::post('/list', [PaymentCustomerController::class, 'list']);
+    Route::post('/search', [PaymentCustomerController::class, 'search']);
 });
 
 
@@ -124,3 +125,7 @@ Route::prefix('price')->group(function () {
     Route::post('list', [PriceController::class, 'listPrices']);
     Route::post('search', [PriceController::class, 'searchPrices']);
 });
+
+Route::post('create-customer', [CustomerController::class, 'createCustomer']);
+
+Route::post('update-customer', [CustomerController::class, 'updateCustomer']);
