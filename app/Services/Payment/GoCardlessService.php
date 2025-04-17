@@ -3,30 +3,12 @@
 namespace App\Services\Payment;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
+use App\Services\BaseRemoteService;
 
-class GoCardlessService
+class GoCardlessService extends BaseRemoteService
 {
-    protected $baseUrl;
-    protected $apiKey;
-
-    public function __construct()
-    {
-        $this->baseUrl = config('services.customer_api.base_url');
-        $this->apiKey = config('services.customer_api.key');
-    }
-
-    protected function sendRequest(array $payload, string $endpoint)
-    {
-        return Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
-            'Accept'        => 'application/json',
-            'Content-Type'  => 'application/json',
-        ])
-            ->post("{$this->baseUrl}/payment/{$endpoint}", $payload)
-            ->throw()
-            ->json();
-    }
-
     // ==========================
     // CUSTOMER OPERATIONS
     // ==========================
@@ -56,7 +38,7 @@ class GoCardlessService
             'company_name' => 'Avoo',
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     public function updateCustomer(array $data = [])
@@ -85,7 +67,7 @@ class GoCardlessService
             'swedish_identity_number' => '',
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     public function retrieveCustomer(array $data = [])
@@ -96,7 +78,7 @@ class GoCardlessService
             'customer_id' => 'CU001FRKGXFTVJ',
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     public function deleteCustomer(array $data = [])
@@ -107,7 +89,7 @@ class GoCardlessService
             'customer_id' => 'CU001FRKGXFTVJ',
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     public function listCustomers(array $data = [])
@@ -128,7 +110,7 @@ class GoCardlessService
             'email' => '',
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     public function searchCustomer(array $data = [])
@@ -139,7 +121,7 @@ class GoCardlessService
             'query' => 'Avoo', // Custom search logic on DB side
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     public function createCharge(array $data = [])
@@ -165,7 +147,7 @@ class GoCardlessService
             'mandate_id' => 'MD123'
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function updateCharge(array $data = [])
@@ -180,7 +162,7 @@ class GoCardlessService
             'charge_id' => 'PM123',
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function retrieveCharge(array $data = [])
@@ -191,7 +173,7 @@ class GoCardlessService
             'charge_id' => 'ch_3R6r2dS0vtd2x8w91TPCrrct', // Required
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function listCharges(array $data = [])
@@ -222,7 +204,7 @@ class GoCardlessService
             'status' => '',
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function cancelCharge(array $data = [])
@@ -233,7 +215,7 @@ class GoCardlessService
             'charge_id' => 'ch_3R6r2dS0vtd2x8w91TPCrrct', // Required
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function retryCharge(array $data = [])
@@ -250,7 +232,7 @@ class GoCardlessService
             'metadata' => [],
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function searchCharges(array $data = [])
@@ -267,7 +249,7 @@ class GoCardlessService
             'query' => 'Avoo',
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function captureCharge(array $data = [])
@@ -279,7 +261,7 @@ class GoCardlessService
             'charge_id' => 'ch_3R6r2dS0vtd2x8w91TPCrrct', // Required
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function createSetupIntent(array $data = [])
@@ -324,7 +306,7 @@ class GoCardlessService
             ]
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function retrieveSetupIntent(array $data = [])
@@ -336,7 +318,7 @@ class GoCardlessService
             'client_secret' => ''
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function confirmSetupIntent(array $data = [])
@@ -348,7 +330,7 @@ class GoCardlessService
             'session_token' => '1212',   // Required
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function listSetupIntents(array $data = [])
@@ -359,7 +341,7 @@ class GoCardlessService
             'limit' => 5,
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function updateSetupIntent(array $data = [])
@@ -370,7 +352,7 @@ class GoCardlessService
             'setup_intent_id' => 'seti_1R7D1ZS0vtd2x8w9HUbloAU7', // Required
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function cancelSetupIntent(array $data = [])
@@ -381,7 +363,7 @@ class GoCardlessService
             'setup_intent_id' => 'seti_1R7D1ZS0vtd2x8w9HUbloAU7', // Required
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function verifyMicrodeposits(array $data = [])
@@ -392,7 +374,7 @@ class GoCardlessService
             'setup_intent_id' => 'seti_1R7D1ZS0vtd2x8w9HUbloAU7', // Required
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function createPaymentIntent(array $data = [])
@@ -426,7 +408,7 @@ class GoCardlessService
             'mandate_id' => 'MD123',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function updatePaymentIntent(array $data = [])
@@ -443,7 +425,7 @@ class GoCardlessService
             'retry_if_possible' => null, // Default value (can be updated as needed)
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function retrievePaymentIntent(array $data = [])
@@ -454,7 +436,7 @@ class GoCardlessService
             'payment_intent_id' => 'pi_3R7Y7wS0vtd2x8w91jhEyrQu',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function listPaymentIntents(array $data = [])
@@ -465,7 +447,7 @@ class GoCardlessService
             'limit' => 10,
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function cancelPaymentIntent(array $data = [])
@@ -476,7 +458,7 @@ class GoCardlessService
             'payment_intent_id' => 'pi_3R7Y7wS0vtd2x8w91jhEyrQu',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function capturePaymentIntent(array $data = [])
@@ -487,7 +469,7 @@ class GoCardlessService
             'payment_intent_id' => 'pi_3R7Y7wS0vtd2x8w91jhEyrQu',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function confirmPaymentIntent(array $data = [])
@@ -498,7 +480,7 @@ class GoCardlessService
             'payment_intent_id' => 'pi_3R7Y7wS0vtd2x8w91jhEyrQu',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function incrementAuthorization(array $data = [])
@@ -510,7 +492,7 @@ class GoCardlessService
             'amount' => 10,
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function applyCustomerBalance(array $data = [])
@@ -521,7 +503,7 @@ class GoCardlessService
             'payment_intent_id' => 'pi_3R7Y7wS0vtd2x8w91jhEyrQu',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function searchPaymentIntents(array $data = [])
@@ -533,7 +515,7 @@ class GoCardlessService
             'limit' => 5,
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function verifyPaymentIntentMicrodeposits(array $data = [])
@@ -545,7 +527,7 @@ class GoCardlessService
             'amounts' => [12, 14],
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function createRefund(array $data = [])
@@ -570,7 +552,7 @@ class GoCardlessService
             ],
         ], $data);
 
-        return $this->sendRequest($data, 'refund');
+        return $this->sendRequest($data, 'refund', 'payment/');
     }
 
     public function updateRefund(array $data = [])
@@ -582,7 +564,7 @@ class GoCardlessService
             'metadata' => ['order_id' => '23'],        // required
         ], $data);
 
-        return $this->sendRequest($data, 'refund');
+        return $this->sendRequest($data, 'refund', 'payment/');
     }
 
     public function retrieveRefund(array $data = [])
@@ -593,7 +575,7 @@ class GoCardlessService
             'refund_id' => 'rd_3hjb243',       // required
         ], $data);
 
-        return $this->sendRequest($data, 'refund');
+        return $this->sendRequest($data, 'refund', 'payment/');
     }
 
     public function listRefunds(array $data = [])
@@ -613,7 +595,7 @@ class GoCardlessService
             'refund_type' => null,
         ], $data);
 
-        return $this->sendRequest($data, 'refund');
+        return $this->sendRequest($data, 'refund', 'payment/');
     }
 
     public function cancelRefund(array $data = [])
@@ -624,7 +606,7 @@ class GoCardlessService
             'refund_id' => 'rd_3hjb243',     // required
         ], $data);
 
-        return $this->sendRequest($data, 'refund');
+        return $this->sendRequest($data, 'refund', 'payment/');
     }
 
     public function createPaymentMethod(array $data = [])
@@ -661,7 +643,7 @@ class GoCardlessService
         ], $data);
 
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function updatePaymentMethod(array $data = [])
@@ -673,7 +655,7 @@ class GoCardlessService
             'metadata' => [],
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function retrievePaymentMethod(array $data = [])
@@ -684,7 +666,7 @@ class GoCardlessService
             'payment_method_id' => 'pm_1RBwHvS0vtd2x8w9O0tcZzYe',  // required
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function listCustomerPaymentMethods(array $data = [])
@@ -695,7 +677,7 @@ class GoCardlessService
             'customer_id' => 'cus_423bh45',  // required
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function cancelPaymentMethod(array $data = [])
@@ -706,7 +688,7 @@ class GoCardlessService
             'payment_method_id' => 'pm_1RBwHvS0vtd2x8w9O0tcZzYe',  // required
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function reinstatePaymentMethod(array $data = [])
@@ -717,7 +699,7 @@ class GoCardlessService
             'payment_method_id' => 'pm_1RBwHvS0vtd2x8w9O0tcZzYe',  // required
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function retrieveCustomerPaymentMethod(array $data = [])
@@ -729,7 +711,7 @@ class GoCardlessService
             'payment_method_id' => 'pm_1RE5ksS0vtd2x8w9ZvirOBXw',  // Example payment method ID
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function listPaymentMethods(array $data = [])
@@ -739,7 +721,7 @@ class GoCardlessService
             'service' => 'gocardless',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function attachPaymentMethod(array $data = [])
@@ -751,7 +733,7 @@ class GoCardlessService
             'customer_id' => 'cus_S8Mu3YNTxaQ9J8',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function detachPaymentMethod(array $data = [])
@@ -763,7 +745,7 @@ class GoCardlessService
             'payment_method' => 'card',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function createPaymentLink(array $data = [])
@@ -823,7 +805,7 @@ class GoCardlessService
         ], $data);
 
 
-        return $this->sendRequest($data, 'payment-links');
+        return $this->sendRequest($data, 'payment-links', 'payment/');
     }
 
     public function initialisePaymentLink(array $data = [])
@@ -835,7 +817,7 @@ class GoCardlessService
             'billing_template_id' => 'brf_435nj', // required
         ], $data);
 
-        return $this->sendRequest($data, 'payment-links');
+        return $this->sendRequest($data, 'payment-links', 'payment/');
     }
 
     public function updatePaymentLink(array $data = [])
@@ -854,7 +836,7 @@ class GoCardlessService
             'metadata' => null
         ], $data);
 
-        return $this->sendRequest($data, 'payment-links');
+        return $this->sendRequest($data, 'payment-links', 'payment/');
     }
 
     public function retrievePaymentLink(array $data = [])
@@ -865,7 +847,7 @@ class GoCardlessService
             'payment_link_id' => 'brf_435nj', // required
         ], $data);
 
-        return $this->sendRequest($data, 'payment-links');
+        return $this->sendRequest($data, 'payment-links', 'payment/');
     }
 
     public function listPaymentLinks(array $data = [])
@@ -876,7 +858,7 @@ class GoCardlessService
             'limit' => 5,  // Default limit, can customize
         ], $data);
 
-        return $this->sendRequest($data, 'payment-links');
+        return $this->sendRequest($data, 'payment-links', 'payment/');
     }
 
     public function retrieveLineItems(array $data = [])
@@ -886,7 +868,7 @@ class GoCardlessService
             'service' => 'gocardless',
             'payment_link_id' => 'brf_435nj', // required
         ], $data);
-        return $this->sendRequest($data, 'payment-links');
+        return $this->sendRequest($data, 'payment-links', 'payment/');
     }
 
     public function createPrice(array $data = [])
@@ -921,7 +903,7 @@ class GoCardlessService
 
         ], $data);
 
-        return $this->sendRequest($data, 'prices');
+        return $this->sendRequest($data, 'prices', 'payment/');
     }
 
     public function updatePrice(array $data = [])
@@ -946,7 +928,7 @@ class GoCardlessService
 
         ], $data);
 
-        return $this->sendRequest($data, 'prices');
+        return $this->sendRequest($data, 'prices', 'payment/');
     }
 
     public function retrievePrice(array $data = [])
@@ -961,7 +943,7 @@ class GoCardlessService
 
         ], $data);
 
-        return $this->sendRequest($data, 'prices');
+        return $this->sendRequest($data, 'prices', 'payment/');
     }
 
     public function listPrices(array $data = [])
@@ -984,7 +966,7 @@ class GoCardlessService
 
         ], $data);
 
-        return $this->sendRequest($data, 'prices');
+        return $this->sendRequest($data, 'prices', 'payment/');
     }
 
     public function searchPrice(array $data = [])
@@ -1006,6 +988,6 @@ class GoCardlessService
 
         ], $data);
 
-        return $this->sendRequest($data, 'prices');
+        return $this->sendRequest($data, 'prices', 'payment/');
     }
 }

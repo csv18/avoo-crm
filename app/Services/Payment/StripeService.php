@@ -3,30 +3,12 @@
 namespace App\Services\Payment;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
+use App\Services\BaseRemoteService;
 
-class StripeService
+class StripeService extends BaseRemoteService
 {
-    protected $baseUrl;
-    protected $apiKey;
-
-    public function __construct()
-    {
-        $this->baseUrl = config('services.customer_api.base_url');
-        $this->apiKey = config('services.customer_api.key');
-    }
-
-    protected function sendRequest(array $payload, string $endpoint)
-    {
-        return Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ])
-            ->post("{$this->baseUrl}/payment/{$endpoint}", $payload)
-            ->throw()
-            ->json();
-    }
-
     // ==========================
     // CUSTOMER OPERATIONS
     // ==========================
@@ -60,7 +42,7 @@ class StripeService
             'test_clock' => '',
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     public function updateCustomer(array $data = [])
@@ -91,7 +73,7 @@ class StripeService
             'tax_exempt' => '', // cleared
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     public function retrieveCustomer(array $data = [])
@@ -102,7 +84,7 @@ class StripeService
             'customer_id' => 'cus_S8JVcWbwI5ZjYa',
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     public function deleteCustomer(array $data = [])
@@ -113,7 +95,7 @@ class StripeService
             'customer_id' => 'cus_S8JVcWbwI5ZjYa',
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     public function listCustomers(array $data = [])
@@ -124,7 +106,7 @@ class StripeService
             'limit' => 5,
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     public function searchCustomer(array $data = [])
@@ -136,7 +118,7 @@ class StripeService
             'limit' => 3,
         ], $data);
 
-        return $this->sendRequest($data, 'customers');
+        return $this->sendRequest($data, 'customers', 'payment/');
     }
 
     // ==========================
@@ -174,7 +156,7 @@ class StripeService
             'tax_exempt' => 'none',
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function updateCharge(array $data = [])
@@ -187,7 +169,7 @@ class StripeService
             'description' => 'Updated charge description',
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function retrieveCharge(array $data = [])
@@ -198,7 +180,7 @@ class StripeService
             'charge_id' => 'ch_3RE3PRS0vtd2x8w91LCHcTof',  // Charge ID
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function listCharges(array $data = [])
@@ -209,7 +191,7 @@ class StripeService
             'limit' => 5,  // Default limit, you can customize
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     public function captureCharge(array $data = [])
@@ -223,7 +205,7 @@ class StripeService
             'statement_descriptor' => 'Captured charge',
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     // public function cancelCharge(array $data = [])
@@ -234,7 +216,7 @@ class StripeService
     //         'charge_id' => 'ch_xxxx',  // Charge ID
     //     ], $data);
 
-    //     return $this->sendRequest($data, 'charges');
+    //     return $this->sendRequest($data, 'charges', 'payment/');
     // }
 
     public function searchCharges(array $data = [])
@@ -246,7 +228,7 @@ class StripeService
             'limit' => 5,  // Default limit for search
         ], $data);
 
-        return $this->sendRequest($data, 'charges');
+        return $this->sendRequest($data, 'charges', 'payment/');
     }
 
     // ==========================
@@ -280,7 +262,7 @@ class StripeService
             'use_stripe_sdk' => '',
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function retrieveSetupIntent(array $data = [])
@@ -291,7 +273,7 @@ class StripeService
             'setup_intent_id' => 'seti_1RE3sqS0vtd2x8w9qt4ESYDn',
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function updateSetupIntent(array $data = [])
@@ -313,7 +295,7 @@ class StripeService
             'payment_method_types' => [],
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function cancelSetupIntent(array $data = [])
@@ -324,7 +306,7 @@ class StripeService
             'setup_intent_id' => 'seti_1RE3sqS0vtd2x8w9qt4ESYDn',
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     // ==========================
@@ -347,7 +329,7 @@ class StripeService
             'use_stripe_sdk' => '',
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function verifyMicrodeposits(array $data = [])
@@ -360,7 +342,7 @@ class StripeService
             'descriptor_code' => 'SM1234',
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     public function listSetupIntents(array $data = [])
@@ -371,7 +353,7 @@ class StripeService
             'limit' => 5,
         ], $data);
 
-        return $this->sendRequest($data, 'setup-intents');
+        return $this->sendRequest($data, 'setup-intents', 'payment/');
     }
 
     // ==========================
@@ -416,7 +398,7 @@ class StripeService
             'use_stripe_sdk' => '',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function updatePaymentIntent(array $data = [])
@@ -447,7 +429,7 @@ class StripeService
             'transfer_group' => '',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function retrievePaymentIntent(array $data = [])
@@ -458,7 +440,7 @@ class StripeService
             'payment_intent_id' => 'pi_3RE4WfS0vtd2x8w90okObr2i',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function cancelPaymentIntent(array $data = [])
@@ -470,7 +452,7 @@ class StripeService
             'cancellation_reason' => 'requested_by_customer',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function capturePaymentIntent(array $data = [])
@@ -482,7 +464,7 @@ class StripeService
             'amount_to_capture' => 1500,  // Optional: specify the amount to capture
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function confirmPaymentIntent(array $data = [])
@@ -494,7 +476,7 @@ class StripeService
             'payment_method' => 'pm_card_visa', // Example of payment method
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function searchPaymentIntents(array $data = [])
@@ -506,7 +488,7 @@ class StripeService
             'limit' => 5,  // Default limit for search
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     public function verifyPaymentIntentMicrodeposits(array $data = [])
@@ -519,7 +501,7 @@ class StripeService
             'descriptor_code' => '', // empty as per input
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     // ==========================
@@ -535,7 +517,7 @@ class StripeService
             'amount' => 1000,  // The amount to increase the authorization by
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     // ==========================
@@ -550,7 +532,7 @@ class StripeService
             'payment_intent_id' => 'pi_3RE4WfS0vtd2x8w90okObr2i',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     // ==========================
@@ -565,7 +547,7 @@ class StripeService
             'limit' => 5,
         ], $data);
 
-        return $this->sendRequest($data, 'payment-intents');
+        return $this->sendRequest($data, 'payment-intents', 'payment/');
     }
 
     // ==========================
@@ -588,7 +570,7 @@ class StripeService
             'reverse_transfer' => false,
         ], $data);
 
-        return $this->sendRequest($data, 'refund');
+        return $this->sendRequest($data, 'refund', 'payment/');
     }
 
     public function updateRefund(array $data = [])
@@ -600,7 +582,7 @@ class StripeService
             'metadata' => ['updated' => true], // Update metadata
         ], $data);
 
-        return $this->sendRequest($data, 'refund');
+        return $this->sendRequest($data, 'refund', 'payment/');
     }
 
     public function retrieveRefund(array $data = [])
@@ -611,7 +593,7 @@ class StripeService
             'refund_id' => 're_3RE5JXS0vtd2x8w910O8IzZj',  // Refund ID
         ], $data);
 
-        return $this->sendRequest($data, 'refund');
+        return $this->sendRequest($data, 'refund', 'payment/');
     }
 
     public function listRefunds(array $data = [])
@@ -624,7 +606,7 @@ class StripeService
             'payment_intent' => null, // Optional: pass payment intent ID to filter
         ], $data);
 
-        return $this->sendRequest($data, 'refund');
+        return $this->sendRequest($data, 'refund', 'payment/');
     }
 
     public function cancelRefund(array $data = [])
@@ -635,7 +617,7 @@ class StripeService
             'refund_id' => 're_3RE5JXS0vtd2x8w910O8IzZj',  // Refund ID
         ], $data);
 
-        return $this->sendRequest($data, 'refund');
+        return $this->sendRequest($data, 'refund', 'payment/');
     }
 
     // ==========================
@@ -719,7 +701,7 @@ class StripeService
             'zip' => null,
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function updatePaymentMethod(array $data = [])
@@ -738,7 +720,7 @@ class StripeService
             'us_bank_account' => [],
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function retrievePaymentMethod(array $data = [])
@@ -749,7 +731,7 @@ class StripeService
             'payment_method_id' => 'pm_1RE5ksS0vtd2x8w9ZvirOBXw',  // Payment Method ID
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function listPaymentMethods(array $data = [])
@@ -760,7 +742,7 @@ class StripeService
             'limit' => 5,  // Default limit, can customize
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function attachPaymentMethod(array $data = [])
@@ -772,7 +754,7 @@ class StripeService
             'customer_id' => 'cus_S8Mu3YNTxaQ9J8',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function detachPaymentMethod(array $data = [])
@@ -784,7 +766,7 @@ class StripeService
             'payment_method' => 'card',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function reinstatePaymentMethod(array $data = [])
@@ -795,7 +777,7 @@ class StripeService
             'payment_method_id' => 'pm_1RE5ksS0vtd2x8w9ZvirOBXw',
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function retrieveCustomerPaymentMethod(array $data = [])
@@ -807,7 +789,7 @@ class StripeService
             'payment_method_id' => 'pm_1RE5ksS0vtd2x8w9ZvirOBXw',  // Example payment method ID
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     public function listCustomerPaymentMethods(array $data = [])
@@ -819,7 +801,7 @@ class StripeService
             'limit' => 5,  // Default limit, you can customize
         ], $data);
 
-        return $this->sendRequest($data, 'payment-methods');
+        return $this->sendRequest($data, 'payment-methods', 'payment/');
     }
 
     // ==========================
@@ -869,7 +851,7 @@ class StripeService
             'tax_id_collection' => [],
         ], $data);
 
-        return $this->sendRequest($data, 'payment-links');
+        return $this->sendRequest($data, 'payment-links', 'payment/');
     }
 
     public function updatePaymentLink(array $data = [])
@@ -901,7 +883,7 @@ class StripeService
             'tax_id_collection' => [],
         ], $data);
 
-        return $this->sendRequest($data, 'payment-links');
+        return $this->sendRequest($data, 'payment-links', 'payment/');
     }
 
     public function retrievePaymentLink(array $data = [])
@@ -912,7 +894,7 @@ class StripeService
             'payment_link_id' => 'plink_1RBweOS0vtd2x8w9a8k9JBg0', // Example payment link ID
         ], $data);
 
-        return $this->sendRequest($data, 'payment-links');
+        return $this->sendRequest($data, 'payment-links', 'payment/');
     }
 
     public function listPaymentLinks(array $filters = [])
@@ -923,7 +905,7 @@ class StripeService
             'limit' => 5,  // Default limit
         ], $filters);
 
-        return $this->sendRequest($data, 'payment-links');
+        return $this->sendRequest($data, 'payment-links', 'payment/');
     }
 
     public function retrieveLineItems(array $data = [])
@@ -934,7 +916,7 @@ class StripeService
             'payment_link_id' => 'plink_1RBweOS0vtd2x8w9a8k9JBg0',  // Example payment link ID
         ], $data);
 
-        return $this->sendRequest($data, 'payment-links');
+        return $this->sendRequest($data, 'payment-links', 'payment/');
     }
 
     // ==========================
@@ -969,7 +951,7 @@ class StripeService
             'unit_amount_decimal' => '1000.0',
         ], $data);
 
-        return $this->sendRequest($data, 'prices');
+        return $this->sendRequest($data, 'prices', 'payment/');
     }
 
     public function updatePrice(array $data = [])
@@ -987,7 +969,7 @@ class StripeService
             'transfer_lookup_key' => null,
         ], $data);
 
-        return $this->sendRequest($data, 'prices');
+        return $this->sendRequest($data, 'prices', 'payment/');
     }
 
     public function retrievePrice(array $data = [])
@@ -998,7 +980,7 @@ class StripeService
             'price_id' => 'price_1RE6TES0vtd2x8w99gudpdXb',  // Price ID
         ], $data);
 
-        return $this->sendRequest($data, 'prices');
+        return $this->sendRequest($data, 'prices', 'payment/');
     }
 
     public function listPrices(array $filters = [])
@@ -1009,7 +991,7 @@ class StripeService
             'limit' => 5, // Default limit
         ], $filters);
 
-        return $this->sendRequest($data, 'prices');
+        return $this->sendRequest($data, 'prices', 'payment/');
     }
 
     public function searchPrice(array $data = [])
@@ -1021,6 +1003,6 @@ class StripeService
             'limit' => 5, // Default limit for search
         ], $data);
 
-        return $this->sendRequest($data, 'prices');
+        return $this->sendRequest($data, 'prices', 'payment/');
     }
 }

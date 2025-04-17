@@ -2,40 +2,19 @@
 
 namespace App\Services\Customer;
 
-use Illuminate\Support\Facades\Http;
+use App\Services\BaseRemoteService;
 
 /**
  * Service class for handling Stripe customer and charge-related operations.
  */
-class CustomerService
+class CustomerService extends BaseRemoteService
 {
-    protected $baseUrl;
-    protected $apiKey;
-
-    public function __construct()
-    {
-        $this->baseUrl = config('services.customer_api.base_url');
-        $this->apiKey = config('services.customer_api.key');
-    }
-
-    protected function sendRequest(array $payload, string $endpoint)
-    {
-        return Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
-            'Accept'        => 'application/json',
-            'Content-Type'  => 'application/json',
-        ])
-            ->post("{$this->baseUrl}/{$endpoint}", $payload)
-            ->throw()
-            ->json();
-    }
-
     public function createCustomer(array $data)
     {
         $data = array_merge([
             'action' => 'createCustomer',
-            'monolith_customer_id' => 'cus_435n',
-            'email' => 'vigneshcs@gmail.com',
+            'monolith_customer_id' => 'cus_435n11',
+            'email' => 'vignesh1817@gmail.com',
             'name' => 'Vignesh',
             'phone' => '',
             'postal_code' => '',

@@ -36,6 +36,7 @@ return [
     ],
     'customer_api' => [
         'base_url' => env('CUSTOMER_API_URL', 'https://your-api-domain.com/api'),
-        'key' => env('CUSTOMER_API_KEY'), // If needed
+        'email' => env('CUSTOMER_EMAIL'),
+        'password' => env('CUSTOMER_PASSWORD'),
     ],
 ];
