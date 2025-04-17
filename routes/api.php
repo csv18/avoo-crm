@@ -129,3 +129,16 @@ Route::prefix('price')->group(function () {
 Route::post('create-customer', [CustomerController::class, 'createCustomer']);
 
 Route::post('update-customer', [CustomerController::class, 'updateCustomer']);
+
+Route::prefix('xero')->group(function () {
+    Route::get('accounts', [XeroController::class, 'getAccounts']);
+    Route::post('accounts', [XeroController::class, 'createAccount']);
+
+    Route::get('invoices', [XeroController::class, 'getInvoices']);
+    Route::post('invoices', [XeroController::class, 'createInvoice']);
+
+    Route::get('contacts', [XeroController::class, 'getContacts']);
+
+    Route::post('items', [XeroController::class, 'createItem']);
+    Route::post('payments', [XeroController::class, 'createPayment']);
+});
