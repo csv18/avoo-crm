@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Api\PriceController;
 use App\Http\Controllers\Api\RefundController;
 use App\Http\Controllers\Api\SetupIntentController;
+use App\Http\Controllers\Api\XeroController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
